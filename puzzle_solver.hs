@@ -39,8 +39,8 @@ numerateRows [] _ = []
 puzzle puzzlePath wordListPath = do
     puzzleContent <- (readFile puzzlePath)
     let strings = transformPuzzle puzzleContent
-    wordListConent <- readFile wordListPath
-    let wordList = lines wordListConent
+    wordListContent <- readFile wordListPath
+    let wordList = lines wordListContent
     return (strings, wordList)
 
 transformPuzzle :: String -> [[(Char, Int)]] 
@@ -70,3 +70,19 @@ lowerTriangle ([]) = []
 invert :: [a] -> [a]
 invert []     = []
 invert (x:xs) = (invert xs) ++ [x]
+
+removeWords :: [[(Char, Int)]] -> [[Char]] -> [[(Char, Int)]]
+removeWords puzzles words = map (\puzzle -> removeWordsFromPuzzle puzzle) puzzles 
+    where 
+        removeWordsFromPuzzle puzzle = foldl (\acc word -> removeFirst acc word) puzzle words
+
+removeFirst :: [(Char, Int)] -> [Char] -> [(Char, Int)]
+removeFirst [] _ = []
+removeFirst x [] = x
+removeFirst x y = remove x y [] []
+    where
+        remove :: [(Char, Int)] -> [Char] -> [(Char, Int)] -> [(Char, Int)]-> [(Char, Int)]
+        remove x [] _ acc = acc ++ x
+        remove [] _ _ acc = acc
+        remove ((x, i):xs) (y:ys) underCheck acc | x == y = remove xs ys (underCheck ++ [(x, i)]) acc
+                                                 | otherwise = remove xs (y:ys) [] (acc ++ underCheck ++ [(x, i)])
