@@ -43,11 +43,12 @@ puzzle puzzlePath wordListPath = do
     let wordList = lines wordListConent
     return (strings, wordList)
 
-transformPuzzle :: String -> [String]
-transformPuzzle cont = lines cont 
-                        ++ transpose (lines cont) 
-                        ++ getDiagonals (lines cont)
-                        ++ getDiagonals (invert (lines cont))
+transformPuzzle :: String -> [[(Char, Int)]] 
+transformPuzzle cont = let numerated = (numerateArrays (lines cont) 1)
+                        in numerated 
+                         ++ transpose numerated
+                         ++ getDiagonals numerated
+                         ++ getDiagonals (invert numerated)
 
 getDiagonals :: [[a]] -> [[a]]
 getDiagonals str = [mainDiagonal str] ++ lowerTriangle str ++ lowerTriangle (transpose str)
@@ -64,6 +65,7 @@ mainDiagonal (x:xs)  = head x : mainDiagonal (map tail xs)
 lowerTriangle :: [[a]] -> [[a]]
 lowerTriangle (x:y:[]) = [[head y]]
 lowerTriangle (x:xs)   = (mainDiagonal xs):(lowerTriangle xs)
+lowerTriangle ([]) = []
 
 invert :: [a] -> [a]
 invert []     = []
