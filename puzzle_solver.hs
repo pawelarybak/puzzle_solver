@@ -1,5 +1,5 @@
 readSolution :: [[(Char, Int)]] -> String
-readSolution a = (getKeys . sortByValue . filterUniqueKeys . concat) a
+readSolution a = (getKeys . sortByValue . filterUniqueValues . concat) a
 
 getKeys:: [(a, b)] -> [a]
 getKeys ((a,b):c) = a:getKeys(c)
@@ -18,15 +18,15 @@ moreEqualTupleValue::Ord b => (a,b) -> (a,b) -> Bool
 moreEqualTupleValue (a,b) (c,d) = b <= d
 
 
-filterUniqueKeys::Eq a => [(a, b)] -> [(a, b)]
-filterUniqueKeys ((a,c):b)
- | (keyElem b a) = (filterUniqueKeys b)
- | otherwise = (a,c):filterUniqueKeys(b)
-filterUniqueKeys [] = []
+filterUniqueValues::Eq a => [(a, b)] -> [(a, b)]
+filterUniqueValues ((a,c):b)
+ | (valueElem b c) = (filterUniqueValues b)
+ | otherwise = (a,c):filterUniqueValues(b)
+filterUniqueValues [] = []
 
-keyElem ::Eq a=> [(a,b)]-> a -> Bool
-keyElem ((a,b):c) d = (a == d) || (keyElem c d)
-keyElem [] a = False
+valueElem ::Eq b=> [(a,b)]-> b -> Bool
+valueElem ((a,b):c) d = (b == d) || (valueElem c d)
+valueElem [] a = False
 
 numerateArrays ::  [[a]] -> Int ->[[(a,Int)]]
 numerateArrays ((a):b) c = (numerateRows a c):(numerateArrays b ((length a) + c))
