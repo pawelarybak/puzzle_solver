@@ -1,3 +1,6 @@
+import System.Environment
+
+
 readSolution :: [[(Char, Int)]] -> String
 readSolution a = (getKeys . sortByValue . filterUniqueValues . concat) a
 
@@ -34,18 +37,6 @@ numerateArrays ([]) _ = []
 numerateRows ::  [a] -> Int ->[(a, Int)]
 numerateRows (a:b) c = (a,c):(numerateRows b (c+1))
 numerateRows [] _ = []
-
-
-puzzle puzzlePath wordListPath = do
-    puzzleContent <- (readFile puzzlePath)
-    let strings = transformPuzzle puzzleContent
-    wordListContent <- readFile wordListPath
-    let wordList = lines wordListContent
-    let matchedIndexes = concatMap (\s -> concatMap (\word -> findMatchingIndexes s word) wordList) strings
-    let stringsWithRemovedWords = removeWords strings matchedIndexes
-    let solution = readSolution stringsWithRemovedWords
-    return solution
-
 
 transformPuzzle :: String -> [[(Char, Int)]] 
 transformPuzzle cont = let numerated = (numerateArrays (lines cont) 1)
@@ -87,3 +78,20 @@ findMatchingIndexes (x:xs) y = findMatchingIndexes' (x:xs) y [] ++ (findMatching
         findMatchingIndexes' [] _ _ = []
         findMatchingIndexes' ((x, i):xs) (y:ys) indexes | x == y = findMatchingIndexes' xs ys (indexes ++ [i])
                                                         | otherwise = []
+
+
+puzzle puzzlePath wordListPath = do
+    puzzleContent <- (readFile puzzlePath)
+    let strings = transformPuzzle puzzleContent
+    wordListContent <- readFile wordListPath
+    let wordList = lines wordListContent
+    let matchedIndexes = concatMap (\s -> concatMap (\word -> findMatchingIndexes s word) wordList) strings
+    let stringsWithRemovedWords = removeWords strings matchedIndexes
+    let solution = readSolution stringsWithRemovedWords
+    return solution
+
+main = do
+    args <- getArgs
+    let [puzzlePath, wordListPath] = args
+    result <- puzzle puzzlePath wordListPath
+    putStrLn result
