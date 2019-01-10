@@ -18,7 +18,7 @@ moreEqualTupleValue::Ord b => (a,b) -> (a,b) -> Bool
 moreEqualTupleValue (a,b) (c,d) = b <= d
 
 
-filterUniqueValues::Eq a => [(a, b)] -> [(a, b)]
+filterUniqueValues::Eq b => [(a, b)] -> [(a, b)]
 filterUniqueValues ((a,c):b)
  | (valueElem b c) = (filterUniqueValues b)
  | otherwise = (a,c):filterUniqueValues(b)
@@ -41,7 +41,9 @@ puzzle puzzlePath wordListPath = do
     let strings = transformPuzzle puzzleContent
     wordListContent <- readFile wordListPath
     let wordList = lines wordListContent
-    return (strings, wordList)
+    let solution = readSolution(removeWords strings wordList)
+    return solution
+
 
 transformPuzzle :: String -> [[(Char, Int)]] 
 transformPuzzle cont = let numerated = (numerateArrays (lines cont) 1)
