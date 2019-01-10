@@ -41,7 +41,9 @@ puzzle puzzlePath wordListPath = do
     let strings = transformPuzzle puzzleContent
     wordListContent <- readFile wordListPath
     let wordList = lines wordListContent
-    let solution = readSolution(removeWords strings wordList)
+    let matchedIndexes = concatMap (\s -> concatMap (\word -> findMatchingIndexes s word) wordList) strings
+    let stringsWithRemovedWords = removeWords strings matchedIndexes
+    let solution = readSolution stringsWithRemovedWords
     return solution
 
 
@@ -73,18 +75,15 @@ invert :: [a] -> [a]
 invert []     = []
 invert (x:xs) = (invert xs) ++ [x]
 
-removeWords :: [[(Char, Int)]] -> [[Char]] -> [[(Char, Int)]]
-removeWords puzzles words = map (\puzzle -> removeWordsFromPuzzle puzzle) puzzles 
-    where 
-        removeWordsFromPuzzle puzzle = foldl (\acc word -> removeFirst acc word) puzzle words
+removeWords :: [[(Char, Int)]] -> [Int] -> [[(Char, Int)]]
+removeWords puzzles matchedIndexes = map (\puzzle -> filter(\(c, i) -> notElem i matchedIndexes) puzzle) puzzles 
 
-removeFirst :: [(Char, Int)] -> [Char] -> [(Char, Int)]
-removeFirst [] _ = []
-removeFirst x [] = x
-removeFirst x y = remove x y [] []
+findMatchingIndexes :: [(Char, Int)] -> [Char] -> [Int]
+findMatchingIndexes [] _ = []
+findMatchingIndexes (x:xs) y = findMatchingIndexes' (x:xs) y [] ++ (findMatchingIndexes xs y)
     where
-        remove :: [(Char, Int)] -> [Char] -> [(Char, Int)] -> [(Char, Int)]-> [(Char, Int)]
-        remove x [] _ acc = acc ++ x
-        remove [] _ _ acc = acc
-        remove ((x, i):xs) (y:ys) underCheck acc | x == y = remove xs ys (underCheck ++ [(x, i)]) acc
-                                                 | otherwise = remove xs (y:ys) [] (acc ++ underCheck ++ [(x, i)])
+        findMatchingIndexes' :: [(Char, Int)] -> [Char] -> [Int] -> [Int]
+        findMatchingIndexes' _ [] indexes = indexes
+        findMatchingIndexes' [] _ _ = []
+        findMatchingIndexes' ((x, i):xs) (y:ys) indexes | x == y = findMatchingIndexes' xs ys (indexes ++ [i])
+                                                        | otherwise = []
