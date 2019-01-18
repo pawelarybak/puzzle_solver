@@ -80,18 +80,26 @@ findMatchingIndexes (x:xs) y = findMatchingIndexes' (x:xs) y [] ++ (findMatching
                                                         | otherwise = []
 
 
-puzzle puzzlePath wordListPath = do
-    puzzleContent <- (readFile puzzlePath)
-    let strings = transformPuzzle puzzleContent
-    wordListContent <- readFile wordListPath
-    let wordList = lines wordListContent
+puzzle board words = do
+    let strings = transformPuzzle board
+    let wordList = lines words
     let matchedIndexes = concatMap (\s -> concatMap (\word -> findMatchingIndexes s word) wordList) strings
     let stringsWithRemovedWords = removeWords strings matchedIndexes
     let solution = readSolution stringsWithRemovedWords
     return solution
 
 main = do
+    -- Get files paths from arguments
     args <- getArgs
     let [puzzlePath, wordListPath] = args
-    result <- puzzle puzzlePath wordListPath
+
+    -- Read files
+    board <- readFile puzzlePath
+    words <- readFile wordListPath
+
+    -- Print board
+    putStrLn board
+
+    -- Get and print result
+    result <- puzzle board words
     putStrLn result
