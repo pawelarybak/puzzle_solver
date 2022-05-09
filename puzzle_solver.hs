@@ -1,6 +1,7 @@
 import System.Environment
 
 
+-- Numerating and reading
 readSolution :: [[(Char, Int)]] -> String
 readSolution a = (getKeys . sortByValue . filterUniqueValues . concat) a
 
@@ -38,6 +39,7 @@ numerateRows ::  [a] -> Int ->[(a, Int)]
 numerateRows (a:b) c = (a,c):(numerateRows b (c+1))
 numerateRows [] _ = []
 
+-- Diagonals
 transformPuzzle :: String -> [[(Char, Int)]] 
 transformPuzzle cont = let numerated = (numerateArrays (lines cont) 1)
                         in numerated 
@@ -66,6 +68,7 @@ invert :: [a] -> [a]
 invert []     = []
 invert (x:xs) = (invert xs) ++ [x]
 
+-- Crossing out
 removeWords :: [[(Char, Int)]] -> [Int] -> [[(Char, Int)]]
 removeWords puzzles matchedIndexes = map (\puzzle -> filter(\(c, i) -> notElem i matchedIndexes) puzzle) puzzles 
 
@@ -78,6 +81,7 @@ findMatchingIndexes (x:xs) y = findMatchingIndexes' (x:xs) y [] ++ (findMatching
         findMatchingIndexes' [] _ _ = []
         findMatchingIndexes' ((x, i):xs) (y:ys) indexes | x == y = findMatchingIndexes' xs ys (indexes ++ [i])
                                                         | otherwise = []
+
 
 
 puzzle board words = do
